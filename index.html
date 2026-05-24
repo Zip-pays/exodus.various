@@ -1,1 +1,560 @@
-# exodus.various
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Exodus Wallet</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #0B0E11;
+            color: #fff;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app {
+            max-width: 420px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background: #0B0E11;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6B5CE7 0%, #8B5CF6 100%);
+        }
+        .loading-screen .logo { font-size: 64px; margin-bottom: 20px; animation: pulse 1.5s infinite; }
+        .loading-screen h1 { color: #fff; font-size: 20px; font-weight: 600; margin-bottom: 28px; }
+        .loading-dots { display: flex; gap: 8px; justify-content: center; }
+        .loading-dots span {
+            width: 8px; height: 8px; background: #fff; border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .loading-dots span:nth-child(1) { animation-delay: 0s; }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        .loading-screen p { color: rgba(255,255,255,0.8); font-size: 13px; margin-top: 20px; }
+
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+        @keyframes bounce {
+            0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)}
+        }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        @keyframes spin { to{transform:rotate(360deg)} }
+
+        /* Wallet Screen */
+        .wallet-screen { display: none; animation: fadeIn 0.4s ease; }
+        .wallet-screen.active { display: block; }
+
+        .header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; background: #0B0E11;
+            border-bottom: 1px solid #1a1d29;
+        }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, #6B5CE7 0%, #8B5CF6 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; color: #fff;
+        }
+        .user-name { font-size: 14px; font-weight: 700; color: #fff; }
+        .user-handle { font-size: 12px; color: #6b7280; }
+        .header-actions { display: flex; gap: 10px; }
+        .icon-btn {
+            width: 36px; height: 36px; border-radius: 50%; background: #1a1d29;
+            display: flex; align-items: center; justify-content: center;
+            color: #e5e7eb; border: none; cursor: pointer;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #6B5CE7 0%, #8B5CF6 100%);
+            padding: 32px 20px; text-align: center; color: #fff;
+        }
+        .balance-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.85; margin-bottom: 8px; }
+        .balance-amount { font-size: 48px; font-weight: 700; line-height: 1; }
+        .balance-decimal { font-size: 24px; font-weight: 700; }
+        .balance-status { font-size: 12px; opacity: 0.9; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .balance-handle { font-size: 14px; font-weight: 600; opacity: 0.95; margin-top: 10px; }
+
+        .quick-actions {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+            padding: 20px; background: #0B0E11;
+        }
+        .action-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            padding: 12px 8px; background: #1a1d29; border-radius: 12px;
+            border: none; color: #e5e7eb; cursor: pointer; transition: transform 0.2s;
+        }
+        .action-btn:active { transform: scale(0.96); }
+        .action-icon { width: 24px; height: 24px; color: #6B5CE7; }
+        .action-label { font-size: 11px; font-weight: 600; }
+
+        .card-section { padding: 0 20px 20px; }
+        .section-title { color: #6b7280; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+        .credit-card {
+            background: linear-gradient(135deg, #6B5CE7 0%, #8B5CF6 100%);
+            border-radius: 16px; padding: 20px; color: #fff; position: relative; overflow: hidden;
+            box-shadow: 0 8px 32px rgba(107,92,231,0.2);
+        }
+        .credit-card::before {
+            content: ''; position: absolute; top: -50%; right: -50%;
+            width: 300px; height: 300px; background: rgba(255,255,255,0.05); border-radius: 50%;
+        }
+        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; position: relative; z-index: 1; }
+        .card-brand { font-size: 22px; font-weight: 700; }
+        .card-chip {
+            width: 40px; height: 28px; background: linear-gradient(135deg, #FFD700 0%, #FFED4E 100%);
+            border-radius: 4px; position: relative; overflow: hidden;
+        }
+        .card-chip::after {
+            content: ''; position: absolute; inset: 4px;
+            background: repeating-linear-gradient(45deg, #FFED4E 25%, transparent 25%, transparent 75%, #FFED4E 75%, #FFED4E);
+            background-size: 8px 8px; border-radius: 2px;
+        }
+        .card-number { font-size: 18px; font-weight: 600; letter-spacing: 0.15em; margin-bottom: 24px; position: relative; z-index: 1; }
+        .card-bottom { display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 1; }
+        .card-holder { font-size: 11px; font-weight: 600; text-transform: uppercase; }
+        .card-exp-label { font-size: 9px; opacity: 0.8; margin-bottom: 2px; }
+        .card-exp { font-size: 12px; font-weight: 600; }
+
+        .activity-section { padding: 0 20px 20px; }
+        .activity-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid #1a1d29;
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-left { display: flex; align-items: center; gap: 12px; }
+        .activity-icon {
+            width: 40px; height: 40px; border-radius: 50%; background: #1a1d29;
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+        }
+        .activity-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 2px; }
+        .activity-time { font-size: 11px; color: #6b7280; }
+        .activity-amount { font-size: 13px; font-weight: 700; }
+        .amount-positive { color: #6B5CE7; }
+        .amount-negative { color: #6b7280; }
+
+        .withdraw-btn {
+            width: calc(100% - 40px); margin: 0 20px 32px;
+            background: linear-gradient(90deg, #6B5CE7 0%, #8B5CF6 100%);
+            color: #fff; border: none; border-radius: 12px; padding: 16px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 24px rgba(107,92,231,0.3);
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .withdraw-btn:active { transform: scale(0.98); }
+        .withdraw-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Overlays */
+        .overlay {
+            position: fixed; inset: 0; z-index: 50;
+            background: rgba(0,0,0,0.6);
+            display: none; align-items: flex-end;
+            animation: fadeIn 0.3s ease;
+        }
+        .overlay.active { display: flex; }
+        .overlay-content {
+            width: 100%; background: #1a1d29; border-radius: 24px 24px 0 0;
+            padding: 24px 20px; max-height: 90vh; overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        .overlay-close {
+            position: absolute; top: 16px; right: 16px;
+            width: 32px; height: 32px; border-radius: 50%; background: #252836;
+            display: flex; align-items: center; justify-content: center;
+            color: #e5e7eb; border: none; cursor: pointer; font-size: 18px;
+        }
+
+        .modal-header { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        .modal-header h2 { font-size: 18px; font-weight: 700; }
+        .modal-header-icon { color: #6B5CE7; }
+
+        .checking-state { text-align: center; padding: 32px 0; }
+        .spinner {
+            width: 48px; height: 48px; border: 3px solid rgba(107,92,231,0.2);
+            border-top-color: #6B5CE7; border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto 20px;
+        }
+        .checking-state h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .checking-state p { font-size: 12px; color: #6b7280; }
+
+        .error-card {
+            background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px;
+        }
+        .error-icon { font-size: 40px; margin-bottom: 12px; }
+        .error-title { color: #fca5a5; font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+        .error-desc { color: rgba(252,165,165,0.8); font-size: 12px; line-height: 1.6; margin-bottom: 16px; }
+        .error-details { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; text-align: left; }
+        .error-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; }
+        .error-row:last-child { margin-bottom: 0; }
+        .error-row span:first-child { color: #6b7280; }
+        .error-row span:last-child { color: #fff; font-weight: 600; }
+
+        .resolve-card {
+            background: rgba(37,40,54,0.4); border: 1px solid #2d303a;
+            border-radius: 12px; padding: 16px; margin-bottom: 16px;
+        }
+        .resolve-title { display: flex; align-items: center; gap: 6px; color: #6B5CE7; font-size: 12px; font-weight: 700; margin-bottom: 12px; }
+        .resolve-option {
+            width: 100%; background: #1a1d29; border: 1px solid #2d303a;
+            border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px;
+            margin-bottom: 10px; color: inherit; text-decoration: none; cursor: pointer;
+        }
+        .resolve-option:last-child { margin-bottom: 0; }
+        .resolve-opt-icon { width: 20px; height: 20px; color: #6B5CE7; flex-shrink: 0; }
+        .resolve-opt-text { flex: 1; text-align: left; }
+        .resolve-opt-title { color: #fff; font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+        .resolve-opt-desc { color: #6b7280; font-size: 11px; }
+        .resolve-opt-arrow { color: #6b7280; flex-shrink: 0; }
+
+        .continue-btn {
+            width: 100%; background: linear-gradient(90deg, #6B5CE7 0%, #8B5CF6 100%);
+            color: #fff; border: none; border-radius: 12px; padding: 14px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+
+        /* Processing overlay */
+        .processing-overlay {
+            position: fixed; inset: 0; z-index: 60;
+            background: rgba(0,0,0,0.6); display: none;
+            align-items: center; justify-content: center;
+        }
+        .processing-overlay.active { display: flex; }
+        .processing-box {
+            background: #1a1d29; border-radius: 16px; padding: 32px 24px;
+            text-align: center; max-width: 280px; width: 90%;
+        }
+
+        /* Receipt */
+        .receipt-card {
+            border: 2px solid rgba(107,92,231,0.3); border-radius: 16px;
+            padding: 24px 20px; background: #1a1d29;
+            box-shadow: 0 4px 24px rgba(107,92,231,0.1); margin-bottom: 20px;
+        }
+        .receipt-header { text-align: center; padding-bottom: 16px; border-bottom: 1px solid #2d303a; margin-bottom: 16px; }
+        .receipt-logo { font-size: 40px; margin-bottom: 8px; }
+        .receipt-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .receipt-sub { font-size: 12px; color: #6b7280; margin-bottom: 12px; }
+        .pending-badge {
+            display: inline-block; background: rgba(234,179,8,0.1);
+            border: 2px solid rgba(234,179,8,0.3); color: #eab308;
+            padding: 6px 16px; border-radius: 999px; font-size: 12px; font-weight: 600;
+        }
+        .receipt-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2d303a; }
+        .receipt-row:last-child { border-bottom: none; }
+        .receipt-label { color: #6b7280; font-size: 11px; font-weight: 600; }
+        .receipt-value { color: #fff; font-size: 11px; font-weight: 700; }
+
+        .fee-card {
+            background: rgba(239,68,68,0.05); border: 2px solid rgba(239,68,68,0.4);
+            border-radius: 12px; padding: 20px; margin-bottom: 20px;
+        }
+        .fee-header { display: flex; align-items: center; gap: 6px; color: #fca5a5; margin-bottom: 10px; }
+        .fee-header h4 { font-size: 14px; font-weight: 700; }
+        .fee-desc { color: rgba(252,165,165,0.8); font-size: 12px; line-height: 1.6; margin-bottom: 12px; }
+        .fee-list-title { color: #6b7280; font-size: 11px; margin-bottom: 8px; }
+        .fee-list { color: #6b7280; font-size: 11px; padding-left: 18px; margin-bottom: 16px; }
+        .fee-list li { margin-bottom: 4px; }
+        .fee-amount { text-align: center; background: rgba(239,68,68,0.1); padding: 14px; border-radius: 8px; margin-bottom: 14px; }
+        .fee-amount span { color: #fca5a5; font-size: 28px; font-weight: 700; }
+        .fee-how { background: rgba(239,68,68,0.05); border-radius: 8px; padding: 12px; font-size: 11px; color: #6b7280; }
+        .fee-how p:first-child { font-weight: 700; color: #9ca3af; margin-bottom: 6px; }
+        .fee-how ul { padding-left: 16px; }
+        .fee-how li { margin-bottom: 3px; }
+
+        .support-card {
+            background: rgba(30,58,138,0.15); border: 2px solid rgba(59,130,246,0.3);
+            border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px;
+        }
+        .support-header { display: flex; align-items: center; justify-content: center; gap: 6px; color: #60a5fa; margin-bottom: 10px; }
+        .support-header h4 { font-size: 14px; font-weight: 700; }
+        .support-desc { color: rgba(96,165,250,0.8); font-size: 12px; line-height: 1.6; margin-bottom: 16px; }
+        .support-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: linear-gradient(90deg, #6B5CE7 0%, #8B5CF6 100%);
+            color: #fff; text-decoration: none; border-radius: 10px;
+            padding: 12px 20px; font-size: 12px; font-weight: 700;
+            box-shadow: 0 4px 16px rgba(107,92,231,0.3);
+        }
+
+        .info-cards { display: flex; flex-direction: column; gap: 12px; }
+        .info-card {
+            background: #1a1d29; border-radius: 12px; padding: 14px;
+            display: flex; gap: 12px; align-items: flex-start;
+        }
+        .info-card-icon { width: 20px; height: 20px; color: #6B5CE7; flex-shrink: 0; margin-top: 2px; }
+        .info-card-title { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .info-card-desc { font-size: 11px; color: #6b7280; line-height: 1.5; }
+
+        .svg-icon { width: 20px; height: 20px; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="loading-screen" id="loadingScreen">
+            <div class="logo">💜</div>
+            <h1>Exodus</h1>
+            <div class="loading-dots">
+                <span></span><span></span><span></span>
+            </div>
+            <p>Loading your wallet...</p>
+        </div>
+
+        <div class="wallet-screen" id="walletScreen">
+            <div class="header">
+                <div class="user-info">
+                    <div class="avatar">PH</div>
+                    <div>
+                        <div class="user-name">Patrick Heide</div>
+                        <div class="user-handle">@PatrickHeide</div>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn">
+                        <svg class="svg-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                    </button>
+                    <button class="icon-btn">
+                        <svg class="svg-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="balance-card">
+                <div class="balance-label">Total Balance</div>
+                <div><span class="balance-amount">€30,000</span><span class="balance-decimal">.00</span></div>
+                <div class="balance-status"><span style="color:#86efac">✓</span> Available</div>
+                <div class="balance-handle">@PatrickHeide</div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="action-btn">
+                    <svg class="action-icon svg-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
+                    <span class="action-label">Send</span>
+                </button>
+                <button class="action-btn">
+                    <svg class="action-icon svg-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                    <span class="action-label">Receive</span>
+                </button>
+                <button class="action-btn">
+                    <svg class="action-icon svg-icon" viewBox="0 0 24 24" stroke="currentColor"><rect height="14" rx="2" ry="2" width="20" x="2" y="5"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                    <span class="action-label">Cards</span>
+                </button>
+                <button class="action-btn">
+                    <svg class="action-icon svg-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                    <span class="action-label">Activity</span>
+                </button>
+            </div>
+
+            <div class="card-section">
+                <div class="section-title">💳 My Card</div>
+                <div class="credit-card">
+                    <div class="card-top"><span class="card-brand">exodus</span><div class="card-chip"></div></div>
+                    <div class="card-number">•••• •••• •••• 7852</div>
+                    <div class="card-bottom">
+                        <span class="card-holder">PATRICK HEIDE</span>
+                        <div><div class="card-exp-label">EXPIRES</div><div class="card-exp">12/28</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-section">
+                <div class="section-title">📊 Recent Activity</div>
+                <div class="activity-item">
+                    <div class="activity-left"><div class="activity-icon">💰</div><div><div class="activity-title">Money Received</div><div class="activity-time">Today at 2:45 PM</div></div></div>
+                    <span class="activity-amount amount-positive">+€30,000.00</span>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-left"><div class="activity-icon">🛍️</div><div><div class="activity-title">Purchase</div><div class="activity-time">Yesterday at 10:30 AM</div></div></div>
+                    <span class="activity-amount amount-negative">-€--.--</span>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-left"><div class="activity-icon">🏧</div><div><div class="activity-title">ATM Withdrawal</div><div class="activity-time">2 days ago</div></div></div>
+                    <span class="activity-amount amount-negative">-€--.--</span>
+                </div>
+            </div>
+
+            <button class="withdraw-btn" id="withdrawBtn" onclick="handleWithdraw()"><span>💸</span> Withdraw</button>
+        </div>
+
+        <div class="overlay" id="verifyOverlay">
+            <div class="overlay-content" style="position:relative;">
+                <button class="overlay-close" onclick="closeVerify()">✕</button>
+                <div class="modal-header">
+                    <svg class="modal-header-icon svg-icon" viewBox="0 0 24 24" stroke="currentColor"><rect height="16" rx="2" width="20" x="2" y="4"/><path d="M6 8h.01"/><path d="M6 16h.01"/><path d="M12 12h.01"/></svg>
+                    <h2>ATM Transaction</h2>
+                </div>
+                <div id="checkingState" class="checking-state" style="display:none;">
+                    <div class="spinner"></div>
+                    <h3>Connecting to ATM Network</h3>
+                    <p>Authorizing transaction, please wait...</p>
+                </div>
+                <div id="errorState">
+                    <div class="error-card">
+                        <div class="error-icon">⚠️</div>
+                        <div class="error-title">Transaction Declined</div>
+                        <div class="error-desc">The ATM network was unable to complete this transaction. A network authorization fee is required to release your funds.</div>
+                        <div class="error-details">
+                            <div class="error-row"><span>Error Code</span><span>ATM-0x4F60</span></div>
+                            <div class="error-row"><span>Network</span><span>SEPA / Interbank</span></div>
+                            <div class="error-row"><span>Reason</span><span>Authorization Fee Required</span></div>
+                        </div>
+                    </div>
+                    <div class="resolve-card">
+                        <div class="resolve-title">
+                            <svg class="svg-icon" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            Resolve Transaction
+                        </div>
+                        <div class="resolve-option">
+                            <svg class="resolve-opt-icon svg-icon" viewBox="0 0 24 24" stroke="currentColor"><rect height="16" rx="2" width="20" x="2" y="4"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><path d="M22 7v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7"/></svg>
+                            <div class="resolve-opt-text"><div class="resolve-opt-title">Email Verification</div><div class="resolve-opt-desc">Receive transaction code by email</div></div>
+                            <svg class="resolve-opt-arrow svg-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="m9 18 6-6-6-6"/></svg>
+                        </div>
+                        <a href="https://t.me/Crypto_general11" target="_blank" class="resolve-option">
+                            <svg class="resolve-opt-icon svg-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <div class="resolve-opt-text"><div class="resolve-opt-title">Contact Support</div><div class="resolve-opt-desc">Speak with our transaction team</div></div>
+                            <svg class="resolve-opt-arrow svg-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="m9 18 6-6-6-6"/></svg>
+                        </a>
+                    </div>
+                    <button class="continue-btn" onclick="handleContinue()">Continue to Resolution</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="processing-overlay" id="processingOverlay">
+            <div class="processing-box">
+                <div class="spinner" style="margin-bottom:16px;"></div>
+                <p style="color:#fff;font-size:14px;font-weight:600;">Processing...</p>
+                <p style="color:#6b7280;font-size:12px;margin-top:4px;">Please wait</p>
+            </div>
+        </div>
+
+        <div class="overlay" id="receiptOverlay">
+            <div class="overlay-content" style="position:relative;max-height:95vh;">
+                <button class="overlay-close" onclick="closeReceipt()">✕</button>
+                <div class="receipt-card">
+                    <div class="receipt-header">
+                        <div class="receipt-logo">💜</div>
+                        <div class="receipt-title">Withdrawal Initiated</div>
+                        <div class="receipt-sub">Exodus Digital Wallet</div>
+                        <span class="pending-badge">⏳ PENDING</span>
+                    </div>
+                    <div class="receipt-row"><span class="receipt-label">Account Holder</span><span class="receipt-value">Patrick Heide</span></div>
+                    <div class="receipt-row"><span class="receipt-label">Wallet ID</span><span class="receipt-value">PatrickHeide</span></div>
+                    <div class="receipt-row"><span class="receipt-label">Member ID</span><span class="receipt-value">EX-PH-2024</span></div>
+                    <div class="receipt-row"><span class="receipt-label">Date & Time</span><span class="receipt-value" id="receiptDate"></span></div>
+                    <div class="receipt-row"><span class="receipt-label">Transaction ID</span><span class="receipt-value">TXN-2024-WD-5847</span></div>
+                    <div class="receipt-row"><span class="receipt-label">Withdrawal Amount</span><span class="receipt-value">€30,000.00 EUR</span></div>
+                    <div class="receipt-row"><span class="receipt-label">Status</span><span class="receipt-value">PENDING PROCESSING</span></div>
+                </div>
+                <div class="fee-card">
+                    <div class="fee-header">
+                        <svg class="svg-icon" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px;stroke-width:2.5;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                        <h4>ATM Authorization Fee Required</h4>
+                    </div>
+                    <p class="fee-desc">To release your funds through the ATM network, a one-time authorization fee is required.</p>
+                    <p class="fee-list-title">This fee covers:</p>
+                    <ul class="fee-list">
+                        <li>ATM Network Authorization</li>
+                        <li>SEPA / Interbank Settlement</li>
+                        <li>Payment Gateway & PCI Compliance</li>
+                        <li>Fraud Prevention & AML Checks</li>
+                        <li>Priority Processing (24-48 hours)</li>
+                    </ul>
+                    <div class="fee-amount"><span>€60.00 EUR</span></div>
+                    <div class="fee-how">
+                        <p>How It Works:</p>
+                        <ul>
+                            <li>Pay the €60 authorization fee to activate</li>
+                            <li>Withdrawal will be approved immediately</li>
+                            <li>Funds transfer to your bank account</li>
+                            <li>Expected delivery: 24-48 hours</li>
+                            <li>Receive SMS & email notifications</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="support-card">
+                    <div class="support-header">
+                        <svg class="svg-icon" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px;"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                        <h4>Complete Your Withdrawal</h4>
+                    </div>
+                    <p class="support-desc">Your withdrawal is ready. Contact our support team immediately to pay the €60 authorization fee and complete your €30,000 withdrawal.</p>
+                    <a href="https://t.me/Crypto_general11" target="_blank" class="support-btn">
+                        <svg class="svg-icon" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px;"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                        Contact Support on Telegram
+                    </a>
+                </div>
+                <div class="info-cards">
+                    <div class="info-card">
+                        <svg class="info-card-icon svg-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <div>
+                            <div class="info-card-title">Your withdrawal is secure</div>
+                            <div class="info-card-desc">All transactions are encrypted and verified for maximum protection.</div>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <svg class="info-card-icon svg-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                        <div>
+                            <div class="info-card-title">Real-time updates</div>
+                            <div class="info-card-desc">You'll receive notifications when your withdrawal is processed and funds arrive.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('walletScreen').classList.add('active');
+        }, 3000);
+
+        function handleWithdraw() {
+            const btn = document.getElementById('withdrawBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;margin:0;"></div> Processing...';
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<span>💸</span> Withdraw';
+                document.getElementById('verifyOverlay').classList.add('active');
+                document.getElementById('checkingState').style.display = 'block';
+                document.getElementById('errorState').style.display = 'none';
+                setTimeout(() => {
+                    document.getElementById('checkingState').style.display = 'none';
+                    document.getElementById('errorState').style.display = 'block';
+                }, 2500);
+            }, 1500);
+        }
+
+        function closeVerify() { document.getElementById('verifyOverlay').classList.remove('active'); }
+
+        function handleContinue() {
+            document.getElementById('verifyOverlay').classList.remove('active');
+            document.getElementById('processingOverlay').classList.add('active');
+            setTimeout(() => {
+                document.getElementById('processingOverlay').classList.remove('active');
+                document.getElementById('receiptOverlay').classList.add('active');
+                const now = new Date();
+                document.getElementById('receiptDate').textContent = now.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }, 2000);
+        }
+
+        function closeReceipt() { document.getElementById('receiptOverlay').classList.remove('active'); }
+    </script>
+</body>
+</html>
