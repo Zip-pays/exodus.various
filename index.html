@@ -48,14 +48,13 @@
     text-align:center; color:#9ca3af; font-size:14px; margin-top:-10px;
   }
   .receiver strong { color:#fff; display:block; font-size:16px; margin-top:4px;}
-  .send-btn {
+  .status-banner {
     display:block; width:100%; margin: 24px 0;
     padding: 16px; border:none; border-radius: 14px;
     background: linear-gradient(90deg,#22c55e,#16a34a);
-    color:#fff; font-size: 17px; font-weight:600; cursor:pointer;
+    color:#fff; font-size: 17px; font-weight:600; text-align:center;
     box-shadow: 0 8px 20px rgba(34,197,94,0.35);
   }
-  .send-btn:disabled { opacity:0.7; cursor:not-allowed; }
   .asset {
     background: rgba(255,255,255,0.05);
     padding: 14px; border-radius: 14px; margin-bottom: 10px;
@@ -75,30 +74,12 @@
   .asset-right { text-align:right; }
   .green { color:#22c55e; }
 
-  /* Loading overlay */
-  .overlay {
-    position: fixed; inset:0; background: rgba(10,14,30,0.92);
-    display:none; align-items:center; justify-content:center;
-    flex-direction:column; z-index: 99;
-  }
-  .overlay.active { display:flex; }
-  .spinner {
-    width: 60px; height: 60px;
-    border: 5px solid rgba(255,255,255,0.15);
-    border-top-color: #22c55e;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg);} }
-  .loading-text { margin-top:20px; color:#fff; font-size:16px;}
-
   /* Receipt modal */
   .receipt-wrap {
     position: fixed; inset:0; background: rgba(0,0,0,0.7);
-    display:none; align-items:flex-start; justify-content:center;
+    display:flex; align-items:flex-start; justify-content:center;
     overflow-y:auto; z-index: 100; padding: 20px;
   }
-  .receipt-wrap.active { display:flex; }
   .email {
     background: #fff; color:#1f2937;
     width:100%; max-width: 600px; border-radius: 12px;
@@ -143,184 +124,194 @@
     background:#f3f4f6; padding:10px; border-radius:6px; word-break:break-all;
     margin-top:6px; color:#111827;
   }
+  .signature {
+    margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb;
+    font-size: 13px; color:#374151; line-height:1.7;
+  }
+  .signature strong { color:#111827; }
   .email-footer {
     background:#f9fafb; padding: 16px 24px; text-align:center;
     color:#6b7280; font-size:12px; border-top:1px solid #e5e7eb;
   }
-  .close-btn {
-    position: fixed; top: 20px; right: 20px;
-    width: 40px; height:40px; border-radius:50%;
-    background:#fff; color:#000; border:none; font-size: 20px;
-    cursor:pointer; z-index: 101;
-  }
 </style>
 </head>
 <body>
-<div class="phone">
-  <div class="top-bar">
-    <div class="logo">E</div>
-    <div class="icons">
-      <div class="icon-btn">🔍</div>
-      <div class="icon-btn">🕒</div>
-    </div>
-  </div>
-
-  <div class="balance-ring">
-    <div class="balance">€30,000</div>
-  </div>
-  <div class="receiver">
-    Receptor
-    <strong>Jose Maria Quinones Manzaneque</strong>
-  </div>
-
-  <button class="send-btn" id="sendBtn">Enviar €30,000</button>
-
-  <div class="asset">
-    <div class="asset-left">
-      <div class="asset-icon xo">XO</div>
-      <div>
-        <div class="asset-name">XO Cash</div>
-        <div class="asset-sub">€0.8594 −0.1%</div>
+  <div class="phone">
+    <div class="top-bar">
+      <div class="logo">E</div>
+      <div class="icons">
+        <div class="icon-btn">🔍</div>
+        <div class="icon-btn">🕒</div>
       </div>
     </div>
-    <div class="asset-right">
-      <div class="green">0 XO</div>
-      <div>€0.00</div>
-    </div>
-  </div>
 
-  <div class="asset">
-    <div class="asset-left">
-      <div class="asset-icon btc">₿</div>
-      <div>
-        <div class="asset-name">Bitcoin</div>
-        <div class="asset-sub">€64,733.81 −1.4%</div>
-      </div>
+    <div class="balance-ring">
+      <div class="balance">€30,000</div>
     </div>
-    <div class="asset-right"><div style="color:#f7931a;">BTC</div></div>
-   <div class="asset-right">
-      <div class="green">0.45 BTC</div>
-      <div>€30,000</div>
+    <div class="receiver">
+      Receptor
+      <strong>Jose Maria Quinones Manzaneque</strong>
     </div>
-  </div>
 
-  <div class="asset">
-    <div class="asset-left">
-      <div class="asset-icon eth">Ξ</div>
-      <div>
-        <div class="asset-name">Ethereum</div>
-        <div class="asset-sub">—</div>
-      </div>
-    </div>
-    <div class="asset-right"><div style="color:#627eea;">ETH</div></div>
-  </div>
-</div>
+    <div class="status-banner">✓ EXODUS CODE purchase successful</div>
 
-<div class="overlay" id="overlay">
-  <div class="spinner"></div>
-  <div class="loading-text">Procesando transacción...</div>
-</div>
-
-<div class="receipt-wrap" id="receipt">
-  <button class="close-btn" onclick="document.getElementById('receipt').classList.remove('active')">×</button>
-  <div class="email">
-    <div class="email-header">
-      <h2>🧾 Exodus Wallet — Recibo de Transacción</h2>
-      <span class="badge">CONFIRMADO</span>
-    </div>
-    <div class="email-meta">
-      <div><strong>De:</strong> receipts@exodus.com</div>
-      <div><strong>Para:</strong> Jose Maria Quinones Manzaneque</div>
-      <div><strong>Asunto:</strong> Confirmación de Retiro — €30,000</div>
-      <div><strong>Fecha:</strong> <span id="txDate"></span></div>
-    </div>
-    <div class="email-body">
-      <h1>Retiro Exitoso</h1>
-      <p>Estimado <strong>Jose Maria Quinones Manzaneque</strong>,</p>
-      <p>
-        Este correo certifica que el retiro de
-        <strong>€30,000.00 EUR</strong> de su Exodus Wallet ha sido
-        procesado exitosamente y enviado a la dirección de destino indicada a continuación.
-      </p>
-
-      <div class="details">
-        <div class="row">
-          <span class="label">ID de Transacción</span>
-          <span class="value" id="txId"></span>
-        </div>
-        <div class="row">
-          <span class="label">Fecha y Hora</span>
-          <span class="value" id="txDate2"></span>
-        </div>
-        <div class="row">
-          <span class="label">Destinatario</span>
-          <span class="value">Jose Maria Quinones Manzaneque</span>
-        </div>
-        <div class="row">
-          <span class="label">Dirección de Recepción</span>
-          <span class="value">
-            <div class="address">bc1q03t8h5ssqc8c5wnsh4p7qa2u4jyvtm6n40fuv4</div>
-          </span>
-        </div>
-        <div class="row">
-          <span class="label">Cantidad Retirada</span>
-          <span class="value">€30,000.00</span>
-        </div>
-        <div class="row">
-          <span class="label">Tarifa EXODUS CODE</span>
-          <span class="value">€25.00</span>
-        </div>
-        <div class="row">
-          <span class="label">Red</span>
-          <span class="value">Bitcoin (BTC)</span>
-        </div>
-        <div class="row">
-          <span class="label">Estado</span>
-          <span class="value" style="color:#16a34a;">✓ Confirmado</span>
-        </div>
-        <div class="row total-row">
-          <span class="label"><strong>Total Debitado</strong></span>
-          <span class="value">€30,025.00</span>
+    <div class="asset">
+      <div class="asset-left">
+        <div class="asset-icon xo">XO</div>
+        <div>
+          <div class="asset-name">XO Cash</div>
+          <div class="asset-sub">€0.8594 <span style="color:#ef4444">−0.1%</span></div>
         </div>
       </div>
-
-      <p>
-        Su transacción ha sido transmitida a la red de Bitcoin y confirmada
-        exitosamente. Por favor guarde este recibo para sus registros. Si no
-        autorizó esta transacción, contacte al Soporte de Exodus inmediatamente.
-      </p>
-
-      <p>Gracias por usar Exodus Wallet.</p>
-      <p style="margin-top:20px;"><strong>— El Equipo de Exodus</strong></p>
+      <div class="asset-right">
+        <div>0 XO</div>
+        <div class="asset-sub">€0.00</div>
+      </div>
     </div>
-    <div class="email-footer">
-      © 2026 Exodus Movement, Inc. Todos los derechos reservados.<br/>
-      Este es un mensaje automático — por favor no responda a este correo.
+
+    <div class="asset">
+      <div class="asset-left">
+        <div class="asset-icon btc">₿</div>
+        <div>
+          <div class="asset-name">Bitcoin</div>
+          <div class="asset-sub">€64,733.81 <span style="color:#ef4444">−1.4%</span></div>
+        </div>
+      </div>
+      <div class="asset-right">
+        <div>0.45 BTC</div>
+        <div class="asset-sub">€30,000</div>
+      </div>
+    </div>
+
+    <div class="asset">
+      <div class="asset-left">
+        <div class="asset-icon eth">Ξ</div>
+        <div>
+          <div class="asset-name">Ethereum</div>
+          <div class="asset-sub">—</div>
+        </div>
+      </div>
+      <div class="asset-right">
+        <div>ETH</div>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-  const btn = document.getElementById('sendBtn');
-  const overlay = document.getElementById('overlay');
-  const receipt = document.getElementById('receipt');
+  <div class="receipt-wrap">
+    <div class="email">
+      <div class="email-header">
+        <h2>🧾 Exodus Wallet — Comprobante Oficial de Transacción</h2>
+        <span class="badge">CONFIRMADO</span>
+      </div>
 
-  btn.addEventListener('click', () => {
-    btn.disabled = true;
-    overlay.classList.add('active');
-    setTimeout(() => {
-      overlay.classList.remove('active');
-      const now = new Date();
-      const dateStr = now.toLocaleString('es-ES', { dateStyle:'full', timeStyle:'short' });
-      document.getElementById('txDate').textContent = dateStr;
-      document.getElementById('txDate2').textContent = dateStr;
-      document.getElementById('txId').textContent =
-        'EXO-' + Math.random().toString(36).substring(2,10).toUpperCase() +
-        '-' + Math.random().toString(36).substring(2,8).toUpperCase();
-      receipt.classList.add('active');
-      btn.disabled = false;
-    }, 4000);
-  });
-</script>
+      <div class="email-meta">
+        <strong>De:</strong> Departamento de Operaciones &lt;operaciones@exodus.com&gt;<br>
+        <strong>Para:</strong> Jose Maria Quinones Manzaneque<br>
+        <strong>Asunto:</strong> Confirmación oficial — Compra EXODUS CODE procesada con éxito (€30,000.00)<br>
+        <strong>Fecha:</strong> 03 de junio de 2026, 14:32 CET<br>
+        <strong>Referencia interna:</strong> EXC-2026-0603-49217
+      </div>
+
+      <div class="email-body">
+        <h1>Compra de EXODUS CODE confirmada</h1>
+
+        <p>Estimado Sr. Jose Maria Quinones Manzaneque:</p>
+
+        <p>
+          Por medio del presente, <strong>Exodus Movement, Inc.</strong> le comunica de manera
+          oficial que su solicitud de compra de <strong>EXODUS CODE</strong> por un importe
+          de <strong>€30,000.00 EUR</strong> ha sido <strong>verificada, autorizada y
+          procesada exitosamente</strong> a través de nuestros sistemas de liquidación.
+        </p>
+
+        <p>
+          La operación ha quedado firmada en la cadena de bloques de Bitcoin y registrada en
+          nuestros libros contables internos bajo la referencia indicada al pie de este
+          comprobante. La trazabilidad de los fondos es íntegra y verificable, y los activos
+          han sido acreditados conforme a la normativa vigente en materia de prevención de
+          blanqueo de capitales (AML) y conocimiento del cliente (KYC).
+        </p>
+
+        <div class="details">
+          <div class="row">
+            <span class="label">Identificador de transacción</span>
+            <span class="value">EXC-2026-0603-49217</span>
+          </div>
+          <div class="row">
+            <span class="label">Fecha y hora</span>
+            <span class="value">03/06/2026 — 14:32:08 CET</span>
+          </div>
+          <div class="row">
+            <span class="label">Titular de la cuenta</span>
+            <span class="value">Jose Maria Quinones Manzaneque</span>
+          </div>
+          <div class="row">
+            <span class="label">Concepto</span>
+            <span class="value">Adquisición de EXODUS CODE</span>
+          </div>
+          <div class="row">
+            <span class="label">Dirección de recepción (BTC)</span>
+            <span class="value">
+              <span class="address">bc1q03t8h5ssqc8c5wnsh4p7qa2u4jyvtm6n40fuv4</span>
+            </span>
+          </div>
+          <div class="row">
+            <span class="label">Importe de la compra</span>
+            <span class="value">€30,000.00</span>
+          </div>
+          <div class="row">
+            <span class="label">Comisión EXODUS CODE</span>
+            <span class="value">€66.00</span>
+          </div>
+          <div class="row">
+            <span class="label">Red de liquidación</span>
+            <span class="value">Bitcoin (BTC)</span>
+          </div>
+          <div class="row">
+            <span class="label">Estado de la operación</span>
+            <span class="value" style="color:#16a34a;">✓ Confirmada y liquidada</span>
+          </div>
+          <div class="row total-row">
+            <span class="label">Total debitado</span>
+            <span class="value">€30,066.00</span>
+          </div>
+        </div>
+
+        <p>
+          Le confirmamos que <strong>no se requiere ninguna acción adicional por su parte</strong>.
+          Los fondos correspondientes a su EXODUS CODE se encuentran disponibles y plenamente
+          operativos en su cuenta. Este comprobante constituye un justificante oficial y
+          definitivo de la operación realizada, con plena validez ante entidades bancarias,
+          fiscales y de auditoría.
+        </p>
+
+        <p>
+          Le recomendamos conservar este documento para sus registros contables. En caso de
+          requerir un certificado adicional firmado digitalmente, puede solicitarlo a través
+          de nuestro Departamento de Soporte indicando la referencia
+          <strong>EXC-2026-0603-49217</strong>.
+        </p>
+
+        <p>
+          Agradecemos la confianza depositada en Exodus Wallet y quedamos a su entera
+          disposición para cualquier aclaración.
+        </p>
+
+        <div class="signature">
+          Atentamente,<br><br>
+          <strong>Departamento de Operaciones y Liquidaciones</strong><br>
+          Exodus Movement, Inc.<br>
+          operaciones@exodus.com<br>
+          www.exodus.com
+        </div>
+      </div>
+
+      <div class="email-footer">
+        © 2026 Exodus Movement, Inc. Todos los derechos reservados.<br>
+        Este mensaje ha sido generado automáticamente por un sistema certificado.
+        No es necesario responder a este correo.
+      </div>
+    </div>
+  </div>
 </body>
 </html>
