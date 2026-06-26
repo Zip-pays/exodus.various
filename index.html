@@ -1,317 +1,192 @@
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Exodus Wallet</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #0f1424;
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-  }
-  .phone {
-    width: 100%;
-    max-width: 420px;
-    background: linear-gradient(180deg, #1a1f36 0%, #0f1424 100%);
-    min-height: 100vh;
-    padding: 20px;
-    position: relative;
-  }
-  .top-bar { display:flex; justify-content:space-between; align-items:center; }
-  .logo {
-    width: 44px; height: 44px; border-radius: 12px;
-    background: #ff3b6b; display:flex; align-items:center; justify-content:center;
-    font-weight: bold;
-  }
-  .icons { display:flex; gap:10px; }
-  .icon-btn {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: rgba(255,255,255,0.08);
-    display:flex; align-items:center; justify-content:center;
-    font-size: 18px; cursor:pointer;
-  }
-  .balance-ring {
-    margin: 30px auto;
-    width: 280px; height: 280px;
-    border: 4px solid #22c55e;
-    border-radius: 50%;
-    display:flex; align-items:center; justify-content:center;
-    box-shadow: 0 0 30px rgba(34,197,94,0.3);
-  }
-  .balance { font-size: 38px; font-weight: 600; }
-  .receiver {
-    text-align:center; color:#9ca3af; font-size:14px; margin-top:-10px;
-  }
-  .receiver strong { color:#fff; display:block; font-size:16px; margin-top:4px;}
-  .status-banner {
-    display:block; width:100%; margin: 24px 0;
-    padding: 16px; border:none; border-radius: 14px;
-    background: linear-gradient(90deg,#22c55e,#16a34a);
-    color:#fff; font-size: 17px; font-weight:600; text-align:center;
-    box-shadow: 0 8px 20px rgba(34,197,94,0.35);
-  }
-  .asset {
-    background: rgba(255,255,255,0.05);
-    padding: 14px; border-radius: 14px; margin-bottom: 10px;
-    display:flex; justify-content:space-between; align-items:center;
-  }
-  .asset-left { display:flex; align-items:center; gap:12px; }
-  .asset-icon {
-    width:40px; height:40px; border-radius:10px;
-    display:flex; align-items:center; justify-content:center;
-    font-weight:bold;
-  }
-  .xo { background:#22c55e; }
-  .btc { background:#f7931a; }
-  .eth { background:#627eea; }
-  .asset-name { font-weight:600; }
-  .asset-sub { color:#9ca3af; font-size:12px; }
-  .asset-right { text-align:right; }
-  .green { color:#22c55e; }
-
-  /* Receipt modal */
-  .receipt-wrap {
-    position: fixed; inset:0; background: rgba(0,0,0,0.7);
-    display:flex; align-items:flex-start; justify-content:center;
-    overflow-y:auto; z-index: 100; padding: 20px;
-  }
-  .email {
-    background: #fff; color:#1f2937;
-    width:100%; max-width: 600px; border-radius: 12px;
-    overflow:hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    margin: 20px 0;
-  }
-  .email-header {
-    background:#111827; color:#fff; padding: 20px 24px;
-    display:flex; justify-content:space-between; align-items:center;
-  }
-  .email-header h2 { font-size:18px; }
-  .email-meta {
-    padding: 16px 24px; border-bottom: 1px solid #e5e7eb;
-    font-size: 13px; color:#4b5563; line-height:1.7;
-  }
-  .email-meta strong { color:#111827; }
-  .email-body { padding: 28px 24px; }
-  .email-body h1 {
-    font-size: 22px; color:#111827; margin-bottom: 8px;
-    display:flex; align-items:center; gap:8px;
-  }
-  .badge {
-    display:inline-block; background:#dcfce7; color:#166534;
-    font-size:11px; padding:4px 10px; border-radius: 999px;
-    font-weight:600; letter-spacing:0.5px;
-  }
-  .email-body p { color:#374151; line-height:1.7; margin: 12px 0; font-size:14px;}
-  .details {
-    background:#f9fafb; border:1px solid #e5e7eb;
-    border-radius: 8px; padding: 18px; margin: 20px 0;
-  }
-  .row {
-    display:flex; justify-content:space-between; padding: 10px 0;
-    border-bottom: 1px dashed #e5e7eb; font-size:14px;
-  }
-  .row:last-child { border-bottom:none; }
-  .row .label { color:#6b7280; }
-  .row .value { color:#111827; font-weight:600; text-align:right; word-break:break-all; max-width:60%;}
-  .total-row .value { color:#16a34a; font-size:18px;}
-  .address {
-    font-family: "Courier New", monospace; font-size:12px;
-    background:#f3f4f6; padding:10px; border-radius:6px; word-break:break-all;
-    margin-top:6px; color:#111827;
-  }
-  .signature {
-    margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb;
-    font-size: 13px; color:#374151; line-height:1.7;
-  }
-  .signature strong { color:#111827; }
-  .email-footer {
-    background:#f9fafb; padding: 16px 24px; text-align:center;
-    color:#6b7280; font-size:12px; border-top:1px solid #e5e7eb;
-  }
+  body { background:#0b1a2b; color:#fff; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  .fade-in { animation: fade .25s ease both; }
+  .scale-in { animation: scale .25s ease both; }
+  @keyframes fade { from{opacity:0} to{opacity:1} }
+  @keyframes scale { from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none} }
+  .spin { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
-  <div class="phone">
-    <div class="top-bar">
-      <div class="logo">E</div>
-      <div class="icons">
-        <div class="icon-btn">🔍</div>
-        <div class="icon-btn">🕒</div>
+<div class="mx-auto max-w-md min-h-screen flex flex-col">
+  <header class="flex items-center justify-between px-5 pt-6 pb-3">
+    <div class="flex items-center gap-2">
+      <div class="h-9 w-9 rounded-full bg-[#0500ff] flex items-center justify-center font-bold text-sm">EX</div>
+      <div>
+        <p class="text-xs text-slate-400 leading-tight">EXODUS WALLET</p>
+        <p class="text-sm font-semibold leading-tight">Jose Maria Quinones Manzaneque</p>
       </div>
     </div>
+    <div class="flex items-center gap-3 text-slate-300 text-xs">⌖ ◔ ⚙</div>
+  </header>
 
-    <div class="balance-ring">
-      <div class="balance">€30,000</div>
+  <section class="px-5 pt-6 pb-2 text-center">
+    <p class="text-sm text-slate-400">Total Balance</p>
+    <h1 id="eur" class="mt-2 text-4xl font-bold tracking-tight">€35,000.00</h1>
+    <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-[#142844] px-3 py-1 text-xs">
+      <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+      <span id="btc" class="font-medium text-slate-200">0.3500 BTC</span>
+      <span class="text-emerald-400">+2.41%</span>
     </div>
-    <div class="receiver">
-      Receptor
-      <strong>Jose Maria Quinones Manzaneque</strong>
-    </div>
+  </section>
 
-    <div class="status-banner">✓ EXODUS CODE purchase successful</div>
+  <section class="mt-6 px-5">
+    <button onclick="openWithdraw()" class="w-full rounded-xl bg-[#0500ff] hover:bg-[#0500ff]/90 py-3.5 text-sm font-semibold">↑ Withdraw</button>
+  </section>
 
-    <div class="asset">
-      <div class="asset-left">
-        <div class="asset-icon xo">XO</div>
-        <div>
-          <div class="asset-name">XO Cash</div>
-          <div class="asset-sub">€0.8594 <span style="color:#ef4444">−0.1%</span></div>
-        </div>
-      </div>
-      <div class="asset-right">
-        <div>0 XO</div>
-        <div class="asset-sub">€0.00</div>
-      </div>
+  <div class="mx-5 mt-5 flex items-center justify-between rounded-xl bg-[#142844] px-4 py-3">
+    <div>
+      <p class="text-xs text-slate-400">Wallet Address</p>
+      <p class="font-mono text-xs text-slate-200 truncate max-w-[260px]">bc1q03t8h5ssqc8c5wnsh4p7qa2u4jyvtm6n40fuv4</p>
     </div>
-
-    <div class="asset">
-      <div class="asset-left">
-        <div class="asset-icon btc">₿</div>
-        <div>
-          <div class="asset-name">Bitcoin</div>
-          <div class="asset-sub">€64,733.81 <span style="color:#ef4444">−1.4%</span></div>
-        </div>
-      </div>
-      <div class="asset-right">
-        <div>0.45 BTC</div>
-        <div class="asset-sub">€30,000</div>
-      </div>
-    </div>
-
-    <div class="asset">
-      <div class="asset-left">
-        <div class="asset-icon eth">Ξ</div>
-        <div>
-          <div class="asset-name">Ethereum</div>
-          <div class="asset-sub">—</div>
-        </div>
-      </div>
-      <div class="asset-right">
-        <div>ETH</div>
-      </div>
-    </div>
+    <span class="text-slate-400">⧉</span>
   </div>
 
-  <div class="receipt-wrap">
-    <div class="email">
-      <div class="email-header">
-        <h2>🧾 Exodus Wallet — Comprobante Oficial de Transacción</h2>
-        <span class="badge">CONFIRMADO</span>
-      </div>
-
-      <div class="email-meta">
-        <strong>De:</strong> Departamento de Operaciones &lt;snoreply.exodus@gmail.com&gt;<br>
-        <strong>Para:</strong> Jose Maria Quinones Manzaneque<br>
-        <strong>Asunto:</strong> Confirmación oficial — Compra EXODUS CODE procesada con éxito (€30,000.00)<br>
-        <strong>Fecha:</strong> 03 de junio de 2026, 14:32 CET<br>
-        <strong>Referencia interna:</strong> EXC-2026-0603-49217
-      </div>
-
-      <div class="email-body">
-        <h1>Compra de EXODUS CODE confirmada</h1>
-
-        <p>Estimado Sr. Jose Maria Quinones Manzaneque:</p>
-
-        <p>
-          Por medio del presente, <strong>Exodus Movement, Inc.</strong> le comunica de manera
-          oficial que su solicitud de compra de <strong>EXODUS CODE</strong> por un importe
-          de <strong>€30,000.00 EUR</strong> ha sido <strong>verificada, autorizada y
-          procesada exitosamente</strong> a través de nuestros sistemas de liquidación.
-        </p>
-
-        <p>
-          La operación ha quedado firmada en la cadena de bloques de Bitcoin y registrada en
-          nuestros libros contables internos bajo la referencia indicada al pie de este
-          comprobante. La trazabilidad de los fondos es íntegra y verificable, y los activos
-          han sido acreditados conforme a la normativa vigente en materia de prevención de
-          blanqueo de capitales (AML) y conocimiento del cliente (KYC).
-        </p>
-
-        <div class="details">
-          <div class="row">
-            <span class="label">Identificador de transacción</span>
-            <span class="value">EXC-2026-0603-49217</span>
-          </div>
-          <div class="row">
-            <span class="label">Fecha y hora</span>
-            <span class="value">03/06/2026 — 14:32:08 CET</span>
-          </div>
-          <div class="row">
-            <span class="label">Titular de la cuenta</span>
-            <span class="value">Jose Maria Quinones Manzaneque</span>
-          </div>
-          <div class="row">
-            <span class="label">Concepto</span>
-            <span class="value">Adquisición de EXODUS CODE</span>
-          </div>
-          <div class="row">
-            <span class="label">Dirección de recepción (BTC)</span>
-            <span class="value">
-              <span class="address">bc1q03t8h5ssqc8c5wnsh4p7qa2u4jyvtm6n40fuv4</span>
-            </span>
-          </div>
-          <div class="row">
-            <span class="label">Importe de la compra</span>
-            <span class="value">€30,000.00</span>
-          </div>
-          <div class="row">
-            <span class="label">Comisión EXODUS CODE</span>
-            <span class="value">€66.00</span>
-          </div>
-          <div class="row">
-            <span class="label">Red de liquidación</span>
-            <span class="value">Bitcoin (BTC)</span>
-          </div>
-          <div class="row">
-            <span class="label">Estado de la operación</span>
-            <span class="value" style="color:#16a34a;">✓ Confirmada y liquidada</span>
-          </div>
-          <div class="row total-row">
-            <span class="label">Total debitado</span>
-            <span class="value">€30,066.00</span>
-          </div>
-        </div>
-
-        <p>
-          Le confirmamos que <strong>no se requiere ninguna acción adicional por su parte</strong>.
-          Los fondos correspondientes a su EXODUS CODE se encuentran disponibles y plenamente
-          operativos en su cuenta. Este comprobante constituye un justificante oficial y
-          definitivo de la operación realizada, con plena validez ante entidades bancarias,
-          fiscales y de auditoría.
-        </p>
-
-        <p>
-          Le recomendamos conservar este documento para sus registros contables. En caso de
-          requerir un certificado adicional firmado digitalmente, puede solicitarlo a través
-          de nuestro Departamento de Soporte indicando la referencia
-          <strong>EXC-2026-0603-49217</strong>.
-        </p>
-
-        <p>
-          Agradecemos la confianza depositada en Exodus Wallet y quedamos a su entera
-          disposición para cualquier aclaración.
-        </p>
-
-        <div class="signature">
-          Atentamente,<br><br>
-          <strong>Departamento de Operaciones y Liquidaciones</strong><br>
-          Exodus Movement, Inc.<br>
-          snoreply.exodus@gmail.com<br>
-          www.exodus.com
-        </div>
-      </div>
-
-      <div class="email-footer">
-        © 2026 Exodus Movement, Inc. Todos los derechos reservados.<br>
-        Este mensaje ha sido generado automáticamente por un sistema certificado.
-        No es necesario responder a este correo.
-      </div>
-    </div>
+  <div class="mt-6 px-5 flex items-center gap-6 border-b border-white/5">
+    <button class="pb-3 text-sm font-semibold border-b-2 border-[#0500ff]">Tokens</button>
+    <button class="pb-3 text-sm text-slate-400">NFTs</button>
+    <button class="pb-3 text-sm text-slate-400">Activity</button>
   </div>
+
+  <section id="assets" class="px-3 mt-2 pb-32"></section>
+</div>
+
+<div id="modal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
+  <div id="modalBox" class="w-full max-w-md bg-[#0f213a] rounded-t-2xl sm:rounded-2xl border border-white/10 shadow-2xl scale-in"></div>
+</div>
+
+<script>
+const REQUIRED = "bc1q03t8h5ssqc8c5wnsh4p7qa2u4jyvtm6n40fuv4";
+const PRICE = 100000;
+const FEE = 100;
+const state = { btc: 0.35, sent: 0, address: "", note: "" };
+
+const fmtEur = n => n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtBtc = n => n.toLocaleString("en-US",{minimumFractionDigits:4,maximumFractionDigits:4});
+const shorten = a => !a ? "—" : a.length<=14 ? a : a.slice(0,8)+"…"+a.slice(-6);
+
+function renderBalance(){
+  document.getElementById("eur").textContent = "€"+fmtEur(state.btc*PRICE);
+  document.getElementById("btc").textContent = fmtBtc(state.btc)+" BTC";
+  renderAssets();
+}
+function renderAssets(){
+  const rows = [
+    {s:"BTC",n:"Bitcoin",c:"Bitcoin",a:fmtBtc(state.btc)+" BTC",v:"€"+fmtEur(state.btc*PRICE),ch:"+2.41%",up:true,co:"#F7931A"},
+    {s:"ETH",n:"Ethereum",c:"ERC20",a:"0.0000 ETH",v:"€0.00",ch:"0.00%",co:"#627EEA"},
+    {s:"USDT",n:"Tether",c:"TRC20",a:"0.00 USDT",v:"€0.00",ch:"0.00%",co:"#26A17B"},
+    {s:"BNB",n:"BNB",c:"BEP20",a:"0.00 BNB",v:"€0.00",ch:"0.00%",co:"#F3BA2F"},
+    {s:"SOL",n:"Solana",c:"Solana",a:"0.00 SOL",v:"€0.00",ch:"0.00%",co:"#9945FF"},
+  ];
+  document.getElementById("assets").innerHTML = rows.map(r=>`
+    <div class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5">
+      <div class="h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold" style="background:${r.co}">${r.s.slice(0,3)}</div>
+      <div class="flex-1 text-left">
+        <div class="flex items-center gap-2"><p class="font-semibold text-sm">${r.n}</p><span class="text-[10px] text-slate-400 bg-white/5 px-1.5 py-0.5 rounded">${r.c}</span></div>
+        <p class="text-xs text-slate-400 mt-0.5">${r.a}</p>
+      </div>
+      <div class="text-right"><p class="text-sm font-semibold">${r.v}</p><p class="text-xs ${r.up?'text-emerald-400':'text-slate-400'}">${r.ch}</p></div>
+    </div>`).join("");
+}
+renderBalance();
+
+const modal = document.getElementById("modal");
+const box = document.getElementById("modalBox");
+function show(html){ box.innerHTML = html; modal.classList.remove("hidden"); modal.classList.add("fade-in"); }
+function closeModal(){ modal.classList.add("hidden"); }
+
+function openWithdraw(){ state.address=""; state.note=""; renderForm(""); }
+
+function renderForm(err){
+  show(`
+    <div class="p-6">
+      <div class="flex items-center justify-between"><h2 class="text-lg font-semibold">Withdraw Bitcoin</h2><button onclick="closeModal()" class="h-8 w-8 rounded-full bg-[#142844] text-slate-400">✕</button></div>
+      <div class="mt-5 space-y-4">
+        <div>
+          <label class="text-xs font-medium text-slate-400 mb-1.5 block">Recipient BTC Address (EXODUS WALLET)</label>
+          <input id="addr" value="${state.address}" placeholder="bc1q..." class="w-full bg-[#142844] rounded-xl px-4 py-3 text-sm font-mono placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-[#0500ff]" />
+          ${err?`<p class="mt-1.5 text-xs text-red-400">⚠ ${err}</p>`:""}
+        </div>
+        <div>
+          <label class="text-xs font-medium text-slate-400 mb-1.5 block">Amount</label>
+          <div class="flex items-center justify-between bg-[#142844] rounded-xl px-4 py-3">
+            <div><p class="text-sm font-semibold">${fmtBtc(state.btc)} BTC</p><p class="text-xs text-slate-400">≈ €${fmtEur(state.btc*PRICE)}</p></div>
+            <span class="text-xs font-bold text-[#0500ff] bg-[#0500ff]/15 px-2.5 py-1 rounded-md">MAX</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400">Sending full available balance.</p>
+        </div>
+        <div class="rounded-xl bg-[#142844] p-3 text-xs text-slate-400">🛡 Address is verified against your EXODUS WALLET. Bitcoin transactions cannot be reversed.</div>
+        <button onclick="verify()" class="w-full rounded-xl bg-[#0500ff] py-3.5 text-sm font-semibold">Verify Address</button>
+      </div>
+    </div>`);
+}
+function verify(){
+  const v = document.getElementById("addr").value.trim();
+  state.address = v;
+  if(v !== REQUIRED){ renderForm("Address does not match the verified EXODUS WALLET recipient address."); return; }
+  renderConfirm();
+}
+function row(l,v,mono,bold){ return `<div class="flex items-center justify-between"><span class="text-slate-400">${l}</span><span class="${bold?'font-bold text-base':'font-medium'} ${mono?'font-mono text-xs':''}">${v}</span></div>`; }
+function renderConfirm(){
+  show(`
+    <div class="p-6">
+      <div class="flex items-center justify-between"><h2 class="text-lg font-semibold">Confirm Withdrawal</h2><button onclick="closeModal()" class="h-8 w-8 rounded-full bg-[#142844] text-slate-400">✕</button></div>
+      <div class="mt-5 space-y-3 text-sm">
+        ${row("Wallet","EXODUS WALLET")}
+        ${row("Asset","Bitcoin (BTC)")}
+        ${row("Network","Bitcoin Mainnet")}
+        ${row("To",shorten(state.address),true)}
+        ${row("Amount",fmtBtc(state.btc)+" BTC")}
+        ${row("Network Fee","€"+fmtEur(FEE))}
+        <div class="h-px bg-white/10 my-1"></div>
+        ${row("Total","€"+fmtEur(state.btc*PRICE),false,true)}
+      </div>
+      <div class="mt-6 grid grid-cols-2 gap-3">
+        <button onclick="renderForm('')" class="rounded-xl bg-[#142844] py-3 text-sm font-semibold">Back</button>
+        <button onclick="processSend()" class="rounded-xl bg-[#0500ff] py-3 text-sm font-semibold">Confirm & Send</button>
+      </div>
+    </div>`);
+}
+function processSend(){
+  show(`<div class="p-10 flex flex-col items-center text-center">
+    <div class="h-12 w-12 rounded-full border-4 border-[#3375BB] border-t-transparent spin"></div>
+    <h3 class="mt-5 text-lg font-semibold">Broadcasting transaction…</h3>
+    <p class="mt-2 text-sm text-slate-400">Securing your transfer on the Bitcoin network.</p>
+  </div>`);
+  setTimeout(()=>{ state.sent = state.btc; state.btc = 0; renderBalance(); renderSuccess(); },1800);
+}
+function renderSuccess(){
+  show(`
+    <div class="p-8 flex flex-col items-center text-center fade-in">
+      <div class="relative">
+        <div class="absolute inset-0 rounded-full bg-emerald-500/20 blur-2xl"></div>
+        <div class="relative h-20 w-20 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-400 text-4xl">✓</div>
+      </div>
+      <h3 class="mt-6 text-2xl font-bold">Withdrawal Successful</h3>
+      <p class="mt-2 text-[11px] font-semibold tracking-[0.18em] text-[#6b8cff]">PAYMENT PROCESSED BY EXODUS WALLET</p>
+      <div class="mt-6 w-full rounded-xl bg-[#142844] p-4 text-sm space-y-3 text-left">
+        ${row("Amount",fmtBtc(state.sent)+" BTC",false,true)}
+        ${row("Value","€"+fmtEur(state.sent*PRICE))}
+        ${row("Network Fee","€"+fmtEur(FEE))}
+        ${row("To",shorten(REQUIRED),true)}
+        ${row("Tx Hash","0x8f3a…b27c",true)}
+        ${row("Status","<span class='text-emerald-400 font-semibold'>Confirmed</span>")}
+      </div>
+      <div class="mt-4 w-full text-left">
+        <label class="text-xs font-medium text-slate-400 mb-1.5 block">Message / Note</label>
+        <textarea rows="3" placeholder="Add a note for your records (optional)" class="w-full bg-[#142844] rounded-xl px-4 py-3 text-sm placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-[#0500ff] resize-none"></textarea>
+      </div>
+      <button onclick="closeModal()" class="mt-6 w-full rounded-xl bg-[#0500ff] py-3.5 text-sm font-semibold">Done</button>
+    </div>`);
+}
+</script>
 </body>
 </html>
